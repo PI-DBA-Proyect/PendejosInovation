@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulación DRP Banco</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-estado="operativo">
+
+  <header class="encabezado">
+    <div class="marca">
+      <div class="marca-logo" aria-hidden="true">B</div>
+      <div>
+        <h1>Banco · Simulación DRP</h1>
+        <p class="sub">banco_db · MySQL 8.0 · Plan de Recuperación ante Desastres</p>
+      </div>
+    </div>
+    <div class="encabezado-der">
+      <div class="estado" id="estado" role="status" aria-live="polite">
+        <span class="estado-icono" id="estado-icono" aria-hidden="true">●</span>
+        <span id="estado-texto">OPERATIVO</span>
+      </div>
+      <div class="reloj">
+        <span id="reloj">12:00:00</span>
+        <small>tiempo simulado</small>
+      </div>
+    </div>
+  </header>
+
+  <nav class="fases" aria-label="Fases de la simulación">
+    <ol id="fases"></ol>
+  </nav>
+
+  <section class="escena" aria-live="polite">
+    <div class="escena-meta">
+      <span class="chip" id="escena-script">Scripts 02 – 04</span>
+      <span class="chip chip-usuario" id="escena-usuario">root</span>
+    </div>
+    <pre class="sql" id="escena-sql"></pre>
+    <p class="narracion" id="escena-texto"></p>
+  </section>
+
+  <main class="principal">
+
+    <!-- Vista del cliente -->
+    <section class="tarjeta cliente">
+      <div class="tarjeta-titulo">
+        <h2>Vista del cliente</h2>
+        <span class="muted">Aplicación bancaria · usuario app_banco</span>
+      </div>
+      <ul class="cuentas" id="cuentas"></ul>
+      <div class="bloqueo" id="bloqueo" hidden>
+        <div class="bloqueo-caja">
+          <svg viewBox="0 0 24 24" width="44" height="44" aria-hidden="true">
+            <rect x="5" y="10.5" width="14" height="10" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/>
+            <circle cx="12" cy="15.5" r="1.4" fill="currentColor"/>
+          </svg>
+          <strong>Servicio en mantenimiento</strong>
+          <span>Las operaciones están suspendidas temporalmente.</span>
+          <code id="bloqueo-error"></code>
+        </div>
+      </div>
+    </section>
+
+    <!-- Consola del DBA -->
+    <section class="consola">
+      <div class="kpis">
+        <div class="kpi">
+          <span class="kpi-etiqueta">Suma de saldos</span>
+          <span class="kpi-valor" id="kpi-suma">—</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-etiqueta">Cuentas en $0</span>
+          <span class="kpi-valor" id="kpi-ceros">—</span>
+          <span class="kpi-nota">de <span id="kpi-total">—</span></span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-etiqueta">read_only</span>
+          <span class="kpi-valor" id="kpi-ro">OFF</span>
+        </div>
+        <div class="kpi">
+          <span class="kpi-etiqueta">Incidentes abiertos</span>
+          <span class="kpi-valor" id="kpi-inc">0</span>
+        </div>
+      </div>
+
+      <div class="tarjeta grafica">
+        <div class="tarjeta-titulo">
+          <h2>Suma de saldos en banco_db</h2>
+          <span class="muted">Monitor <code>ev_vigila_saldos</code> · cada 30 s</span>
+        </div>
+        <div class="grafica-caja" id="grafica-caja">
+          <svg id="grafica" role="img" aria-label="Suma de saldos a lo largo del tiempo simulado"></svg>
+          <div class="tooltip" id="tooltip" hidden></div>
+        </div>
+      </div>
+
+      <div class="duo">
+        <div class="tarjeta">
+          <div class="tarjeta-titulo">
+            <h2>Bitácora de incidentes</h2>
+            <span class="muted">drp_monitor</span>
+          </div>
+          <ul class="bitacora" id="bitacora"></ul>
+        </div>
+        <div class="tarjeta">
+          <div class="tarjeta-titulo">
+            <h2>Registro de operaciones</h2>
+            <span class="muted">servidor</span>
+          </div>
+          <div class="progreso" id="progreso" hidden>
+            <div class="progreso-barra"><span id="progreso-relleno"></span></div>
+            <span class="progreso-texto" id="progreso-texto"></span>
+          </div>
+          <ol class="registro" id="registro"></ol>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="metricas">
+      <div class="metrica"><span>MTTD</span><strong id="m-mttd">—</strong><small>tiempo en detectar</small></div>
+      <div class="metrica"><span>MTTR</span><strong id="m-mttr">—</strong><small>fallo → servicio reabierto</small></div>
+      <div class="metrica"><span>Cuentas recuperadas</span><strong id="m-rec">—</strong><small>vs. auditoría</small></div>
+      <div class="metrica"><span>RPO</span><strong id="m-rpo">—</strong><small>datos perdidos</small></div>
+    </div>
+    <div class="controles">
+      <button type="button" id="btn-ant" aria-label="Fase anterior">◀ Anterior</button>
+      <button type="button" id="btn-play" class="primario">▶ Reproducir</button>
+      <button type="button" id="btn-sig" aria-label="Fase siguiente">Siguiente ▶</button>
+      <button type="button" id="btn-reset" aria-label="Reiniciar">↺</button>
+      <span class="atajos">← → fases · espacio reproducir</span>
+    </div>
+  </footer>
+
+  <script src="datos.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

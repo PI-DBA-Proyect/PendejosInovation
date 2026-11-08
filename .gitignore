@@ -1,0 +1,12 @@
+# Datos generados (transacciones.txt supera el limite de 100 MB de GitHub)
+**/Datos/*.txt
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Respaldos y salidas del DRP
+*.sql.bak
+replay_binlog.sql
